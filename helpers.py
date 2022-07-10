@@ -3,6 +3,7 @@ import os
 import re
 
 import wx
+from parse import parse
 
 PLUGIN_PATH = os.path.split(os.path.abspath(__file__))[0]
 
@@ -80,7 +81,10 @@ def get_lcsc_value(fp):
     """Get lcsc from all properties and allow various variants."""
     lcsc_keys = [key for key in fp.GetProperties().keys() if "lcsc" in key.lower()]
     if lcsc_keys:
-        return fp.GetProperties().get(lcsc_keys.pop(0), "")
+        value = fp.GetProperties().get(lcsc_keys.pop(0), "")
+        if (value.startswith("$")):
+            value = fp.GetProperties().get(parse("${{{}}", value).fixed[0], "")
+        return value
     return ""
 
 
